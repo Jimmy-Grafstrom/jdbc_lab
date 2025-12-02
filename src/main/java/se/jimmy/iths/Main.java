@@ -5,7 +5,7 @@ import se.jimmy.iths.connector.DatabaseConnector;
 import java.sql.*;
 
 public class Main {
-    static void main() {
+    public static void main() {
 
         Connection conn = DatabaseConnector.getConnection();
         if (conn == null) {
@@ -21,10 +21,12 @@ public class Main {
         try {
             DatabaseMetaData meta = conn.getMetaData();
             System.out.println("Ansluten till databas:");
+            System.out.println("#---------------------#");
             System.out.println("- Produkt: " + meta.getDatabaseProductName());
             System.out.println("- Version: " + meta.getDatabaseProductVersion());
             System.out.println("- Driver: " + meta.getDriverName());
             System.out.println("- URL: " + meta.getURL());
+            System.out.println("#---------------------#");
 
             PreparedStatement statement = conn.prepareStatement(sql);
             try (ResultSet rs = statement.executeQuery()) {
@@ -41,7 +43,8 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("#---------------------#");
-        String sqlFilter = "SELECT * FROM person WHERE income > ?"; // AND dob > ?";
+        String sqlFilter = "SELECT * FROM person WHERE income > ?";
+        System.out.println("Personer som ");
 
         try (PreparedStatement statement = conn.prepareStatement(sqlFilter)) {
             statement.setDouble(1, 150000.0);
