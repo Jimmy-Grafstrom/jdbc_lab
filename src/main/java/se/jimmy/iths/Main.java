@@ -1,17 +1,24 @@
 package se.jimmy.iths;
 
+import se.jimmy.iths.connector.DatabaseConnector;
+
 import java.sql.*;
 
 public class Main {
     static void main() {
-        String url = "jdbc:mysql://localhost:3306/lab2-mySql";
 
-        String user = "lab_user";
-        String pass = "password";
+        Connection conn = DatabaseConnector.getConnection();
+        if (conn == null) {
+            System.err.println("Could not get connection to database.");
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Closing database connection...");
+            DatabaseConnector.closeConnection();
+        }));
 
         String sql = "SELECT * FROM person";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+        try {
             DatabaseMetaData meta = conn.getMetaData();
             System.out.println("Ansluten till databas:");
             System.out.println("- Produkt: " + meta.getDatabaseProductName());
@@ -36,8 +43,7 @@ public class Main {
         System.out.println("#---------------------#");
         String sqlFilter = "SELECT * FROM person WHERE income > ?"; // AND dob > ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement statement = conn.prepareStatement(sqlFilter)) {
+        try (PreparedStatement statement = conn.prepareStatement(sqlFilter)) {
             statement.setDouble(1, 150000.0);
 
             try (ResultSet rs = statement.executeQuery()) {
@@ -56,8 +62,7 @@ public class Main {
         System.out.println("#---------------------#");
         String insertNewPerson = "INSERT INTO person (first_name, last_name, dob, income) VALUES (?, ?, ?, ?)";
 
-        try(Connection conn = DriverManager.getConnection(url, user, pass);
-        PreparedStatement statement = conn.prepareStatement(insertNewPerson)) {
+        try (PreparedStatement statement = conn.prepareStatement(insertNewPerson)) {
             statement.setString(1, "Lisa");
             statement.setString(2, "Larsson");
             statement.setDate(3, new java.sql.Date(System.currentTimeMillis()));
@@ -71,8 +76,7 @@ public class Main {
         System.out.println("#---------------------#");
         String updateIncomePerson = "UPDATE person SET income = ? WHERE person_id >= ?";
 
-        try(Connection conn = DriverManager.getConnection(url, user, pass);
-        PreparedStatement statement = conn.prepareStatement(updateIncomePerson)) {
+        try (PreparedStatement statement = conn.prepareStatement(updateIncomePerson)) {
             statement.setDouble(1, 250000.0);
             statement.setInt(2, 6);
             int rowsInserted = statement.executeUpdate();
@@ -84,8 +88,7 @@ public class Main {
         }
         System.out.println("#---------------------#");
         String deletePerson = "DELETE FROM person WHERE person_id >= ?";
-        try(Connection conn = DriverManager.getConnection(url, user, pass);
-        PreparedStatement statement = conn.prepareStatement(deletePerson)) {
+        try (PreparedStatement statement = conn.prepareStatement(deletePerson)) {
             statement.setInt(1, 6);
             int rowsDeleted = statement.executeUpdate();
             System.out.println("Antal rader borttagna: " + rowsDeleted);
@@ -93,5 +96,10 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("#---------------------#");
+
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            System.out.println("Closing database connection...");
+//            DatabaseConnector.closeConnection();
+//        }));
     }
 }
