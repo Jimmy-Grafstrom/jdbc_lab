@@ -100,9 +100,5 @@ public class Main {
         }
         System.out.println("#---------------------#");
 
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            System.out.println("Closing database connection...");
-//            DatabaseConnector.closeConnection();
-//        }));
     }
 }
