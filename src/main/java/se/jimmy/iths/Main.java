@@ -63,41 +63,12 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("#---------------------#");
-        String insertNewPerson = "INSERT INTO person (first_name, last_name, dob, income) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement statement = conn.prepareStatement(insertNewPerson)) {
-            statement.setString(1, "Lisa");
-            statement.setString(2, "Larsson");
-            statement.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-            statement.setDouble(4, 150000.0);
-            int rowsInserted = statement.executeUpdate();
-            System.out.println("Antal rader infogade: " + rowsInserted);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
         System.out.println("#---------------------#");
-        String updateIncomePerson = "UPDATE person SET income = ? WHERE person_id >= ?";
 
-        try (PreparedStatement statement = conn.prepareStatement(updateIncomePerson)) {
-            statement.setDouble(1, 250000.0);
-            statement.setInt(2, 6);
-            int rowsInserted = statement.executeUpdate();
-            System.out.println("Antal rader uppdaterade: " + rowsInserted);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         System.out.println("#---------------------#");
-        String deletePerson = "DELETE FROM person WHERE person_id >= ?";
-        try (PreparedStatement statement = conn.prepareStatement(deletePerson)) {
-            statement.setInt(1, 6);
-            int rowsDeleted = statement.executeUpdate();
-            System.out.println("Antal rader borttagna: " + rowsDeleted);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         System.out.println("#---------------------#");
 
     }

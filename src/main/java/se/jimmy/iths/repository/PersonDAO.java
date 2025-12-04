@@ -5,6 +5,9 @@ import se.jimmy.iths.model.Person;
 import java.util.List;
 
 public interface PersonDAO {
-    void insert(Person person);
     List<Person> findAll();
+    Person findById(Long id);
+    void insert(Person person);
+    void update(Person person);
+    void delete(Long id);
 }
