@@ -5,24 +5,16 @@ import se.jimmy.iths.model.Person;
 import se.jimmy.iths.repository.PersonDAO;
 import se.jimmy.iths.repository.PersonDAOImpl;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
 
 public class Main {
     public static void main() {
 
-        Connection conn = DatabaseConnector.getConnection();
-//        if (conn == null) {
-//            System.err.println("Could not get connection to database.");
-//        }
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            System.out.println("Closing database connection...");
-//            DatabaseConnector.closeConnection();
-//        }));
-        PersonDAO personDAO = new PersonDAOImpl();
-
-        try {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             DatabaseMetaData meta = conn.getMetaData();
             System.out.println("Ansluten till databas:");
             System.out.println("#---------------------#");
@@ -32,8 +24,12 @@ public class Main {
             System.out.println("- URL: " + meta.getURL());
             System.out.println("#---------------------#");
         } catch (SQLException e) {
+            System.err.println("Kunde inte ansluta till databasen för att hämta metadata.");
             e.printStackTrace();
         }
+
+        PersonDAO personDAO = new PersonDAOImpl();
+
         System.out.println("---findAll---");
         personDAO.findAll().forEach(System.out::println);
 
@@ -42,12 +38,20 @@ public class Main {
         personDAO.insert(newPerson);
 
         System.out.println("---findById---");
-        System.out.println("Hittade: " + personDAO.findById(1L).getFirstName() + ", genom att söka efter Id=1");
+        Person foundPerson = personDAO.findById(1L);
+        if (foundPerson != null) {
+            System.out.println("Hittade: " + foundPerson.getFirstName() + ", genom att söka efter Id=1");
+        } else {
+            System.out.println("Ingen person hittades med Id=1");
+        }
 
         System.out.println("---Update---");
         Person person1 = personDAO.findById(1L);
-        person1.setFirstName("Hedvig");
-        personDAO.update(person1);
+        if (person1 != null) {
+            person1.setFirstName("Hedvig");
+            personDAO.update(person1);
+        }
+
         System.out.println("#---------------------#");
         personDAO.delete(29L);
         System.out.println("#---------------------#");
