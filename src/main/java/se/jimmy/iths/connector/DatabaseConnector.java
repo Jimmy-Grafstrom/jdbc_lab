@@ -16,16 +16,16 @@ public class DatabaseConnector {
     }
 
     public static Connection getConnection() {
-        if (connection == null) {
-            synchronized (DatabaseConnector.class) {
-                if (connection == null) {
-                    try {
+        try {
+            if (connection == null || connection.isClosed()) {
+                synchronized (DatabaseConnector.class) {
+                    if (connection == null || connection.isClosed()) {
                         connection = createConnection();
-                    } catch (SQLException e) {
-                        throw new RuntimeException("misslyckades med anslutning till databas", e);
                     }
                 }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Misslyckades med att kontrollera eller återskapa databasanslutning", e);
         }
         return connection;
     }

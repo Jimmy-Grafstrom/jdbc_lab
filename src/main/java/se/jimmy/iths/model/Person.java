@@ -41,6 +41,17 @@ public class Person {
         return lastName;
     }
 
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dob=" + dob +
+                ", income=" + income +
+                '}';
+    }
+
     public Date getDob() {
         return dob;
     }

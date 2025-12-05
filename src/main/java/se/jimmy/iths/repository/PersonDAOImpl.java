@@ -9,26 +9,33 @@ import java.util.List;
 
 public class PersonDAOImpl implements PersonDAO {
 
+
     @Override
     public List<Person> findAll() {
-        List<Person> persons = new ArrayList<>();
-        String sql = "SELECT * FROM person";
+
+        List<Person> list = new ArrayList<>();
+        String sql =  "SELECT * FROM person";
 
         try (Connection conn = DatabaseConnector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
             while (rs.next()) {
-                persons.add(new Person(
+                Person p = new Person(
                         rs.getLong("person_id"),
                         rs.getString("first_name"),
                         rs.getString("last_name"),
                         rs.getDate("dob"),
-                        rs.getDouble("income")));
+                        rs.getDouble("income")
+                );
+                list.add(p);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return persons;
+
+        return list;
     }
 
 
@@ -71,9 +78,13 @@ public class PersonDAOImpl implements PersonDAO {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     person.setId(rs.getLong(1));
+                    System.out.println("DAO: Lade till person: " + person.getFirstName() + " med ID: " + person.getId());
+                } else {
+                    System.out.println("DAO: Kunde inte hämta genererat ID för ny person.");
                 }
             }
         } catch (SQLException e) {
+            System.err.println("DAO: FEL vid insättning av person: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -90,10 +101,15 @@ public class PersonDAOImpl implements PersonDAO {
             ps.setDate(3, person.getDob());
             ps.setDouble(4, person.getIncome());
             ps.setLong(5, person.getId());
-            ps.executeUpdate();
-
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("DAO: Uppdaterade person med ID " + person.getId() + ". Rader påverkade: " + rowsAffected);
+            } else {
+                System.out.println("DAO: Hittade ingen person med ID " + person.getId() + " att uppdatera.");
+            }
 
         } catch (Exception e) {
+            System.err.println("DAO: FEL vid uppdatering av person med ID " + person.getId() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -104,8 +120,14 @@ public class PersonDAOImpl implements PersonDAO {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
-            ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("DAO: Tog bort person med ID " + id + ". Rader påverkade: " + rowsAffected);
+            } else {
+                System.out.println("DAO: Hittade ingen person med ID " + id + " att ta bort.");
+            }
         } catch (Exception e) {
+            System.err.println("DAO: FEL vid borttagning av person med ID " + id + ": " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -3,3 +3,4 @@ jdbc:
     url: "//localhost:3306/lab2-mySql"
     user: "lab_user"
     pass: "password"
+
